@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ISOLATES - [CLASIFICADO]</title>
+    <meta name="description" content="Proyecto ISOLATES - Experiencia social inmersiva de supervivencia psicológica">
+    <meta name="keywords" content="ISOLATES, juego social, backrooms, SCP, supervivencia">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='40' fill='none' stroke='%234a90e2' stroke-width='4'/><path d='M30 50 A20 20 0 0 1 70 50' fill='none' stroke='%234a90e2' stroke-width='3'/><rect x='30' y='50' width='40' height='20' fill='%234a90e2'/></svg>">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary-blue: #1a4b8c;
+            --secondary-blue: #2e5aa0;
+            --light-blue: #4a90e2;
+            --dark-blue: #0f2847;
+            --accent-cyan: #00d4ff;
+            --bg-dark: #0a0a0a;
+            --bg-secondary: #1a1a1a;
+            --text-primary: #e0e0e0;
+            --text-secondary: #b0b0b0;
+            --border-glow: rgba(74, 144, 226, 0.5);
+        }
+        
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        /* Animated background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, var(--dark-blue) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, var(--primary-blue) 0%, transparent 50%),
+                radial-gradient(circle at 40% 80%, var(--secondary-blue) 0%, transparent 50%);
+            opacity: 0.1;
+            z-index: -1;
+            animation: backgroundPulse 10s ease-in-out infinite;
+        }
+        
+        @keyframes backgroundPulse {
+            0%, 100% { opacity: 0.1; }
+            50% { opacity: 0.2; }
+        }
+        
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(26, 26, 26, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid var(--border-glow);
+            z-index: 1000;
+            padding: 1rem 0;
+        }
+        
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--light-blue);
+            text-decoration: none;
+        }
+        
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--light-blue);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            animation: logoGlow 3s ease-in-out infinite;
+        }
+        
+        .logo-icon::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 10px;
+            border-radius: 10px 10px 0 0;
+            border: 2px solid var(--light-blue);
+            border-bottom: none;
+        }
+        
+        .logo-icon::after {
+            content: '';
+            position: absolute;
+            bottom: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 10px;
+            background: var(--light-blue);
+            border-radius: 0 0 10px 10px;
+        }
+        
+        @keyframes logoGlow {
+            0%, 100% { box-shadow: 0 0 5px var(--light-blue); }
+            50% { box-shadow: 0 0 20px var(--light-blue), 0 0 30px var(--accent-cyan); }
+        }
+        
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+        
+        .nav-item a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+        }
+        
+        .nav-item a:hover {
+            color: var(--light-blue);
+            background: rgba(74, 144, 226, 0.1);
+            box-shadow: 0 0 10px rgba(74, 144, 226, 0.3);
+        }
+        
+        /* Main content */
+        .main-content {
+            margin-top: 100px;
+            min-height: 100vh;
+        }
+        
+        /* Hero section */
+        .hero {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: linear-gradient(135deg, var(--dark-blue), var(--primary-blue));
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="%234a90e2" stroke-width="0.5" opacity="0.3"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.3;
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .hero h1 {
+            font-size: 4rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 20px var(--light-blue);
+            animation: titleFlicker 2s ease-in-out infinite;
+        }
+        
+        @keyframes titleFlicker {
+            0%, 90%, 100% { opacity: 1; }
+            95% { opacity: 0.8; }
+        }
+        
+        .hero-subtitle {
+            font-size: 1.2rem;
+            color: var(--accent-cyan);
+            margin-bottom: 2rem;
+            font-weight: 300;
+        }
+        
+        .classification {
+            background: rgba(255, 0, 0, 0.1);
+            border: 2px solid #ff0000;
+            padding: 1rem;
+            margin: 2rem 0;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+        
+        .classification strong {
+            color: #ff4444;
+        }
+        
+        /* Section styles */
+        .section {
+            padding: 4rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .section h2 {
+            font-size: 2.5rem;
+            color: var(--light-blue);
+            margin-bottom: 2rem;
+            text-align: center;
+            position: relative;
+        }
+        
+        .section h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--light-blue), transparent);
+        }
+        
+        /* Grid layout */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+        
+        .card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-glow);
+            border-radius: 8px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(74, 144, 226, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .card:hover {
+            border-color: var(--light-blue);
+            box-shadow: 0 5px 20px rgba(74, 144, 226, 0.3);
+            transform: translateY(-5px);
+        }
+        
+        .card:hover::before {
+            left: 100%;
+        }
+        
+        .card h3 {
+            color: var(--light-blue);
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .card p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Event status */
+        .event-status {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+        }
+        
+        .status-active {
+            background: rgba(0, 255, 0, 0.2);
+            color: #00ff00;
+            border: 1px solid #00ff00;
+        }
+        
+        .status-pending {
+            background: rgba(255, 255, 0, 0.2);
+            color: #ffff00;
+            border: 1px solid #ffff00;
+        }
+        
+        .status-classified {
+            background: rgba(255, 0, 0, 0.2);
+            color: #ff0000;
+            border: 1px solid #ff0000;
+        }
+        
+        /* Footer */
+        .footer {
+            background: var(--bg-secondary);
+            border-top: 2px solid var(--border-glow);
+            padding: 2rem;
+            text-align: center;
+            margin-top: 4rem;
+        }
+        
+        .footer p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+            }
+            
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .section {
+                padding: 2rem 1rem;
+            }
+            
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Glitch effect for buttons */
+        .btn-report {
+            background: linear-gradient(45deg, #ff0000, #ff4444);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 4px;
+            font-family: inherit;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-report:hover {
+            animation: glitch 0.3s ease-in-out;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+        }
+        
+        @keyframes glitch {
+            0% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+            100% { transform: translate(0); }
+        }
+        
+        /* Terminal text effect */
+        .terminal-text {
+            font-family: 'JetBrains Mono', monospace;
+            background: #000;
+            color: #00ff00;
+            padding: 1rem;
+            border-radius: 4px;
+            margin: 1rem 0;
+            border-left: 4px solid #00ff00;
+            animation: terminalBlink 1s infinite;
+        }
+        
+        @keyframes terminalBlink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.8; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="nav-container">
+            <a href="#" class="logo">
+                <div class="logo-icon"></div>
+                ISOLATES
+            </a>
+            <nav>
+                <ul class="nav-menu">
+                    <li class="nav-item"><a href="#home">INICIO</a></li>
+                    <li class="nav-item"><a href="#about">INFORMACIÓN</a></li>
+                    <li class="nav-item"><a href="#events">EVENTOS</a></li>
+                    <li class="nav-item"><a href="#lore">HISTORIA</a></li>
+                    <li class="nav-item"><a href="#reports">REPORTES</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <section id="home" class="hero">
+            <div class="hero-content">
+                <h1>ISOLATES</h1>
+                <p class="hero-subtitle">PROYECTO DE AISLAMIENTO EXPERIMENTAL</p>
+                
+                <div class="classification">
+                    <strong>CLASIFICACIÓN:</strong> NIVEL OMEGA - ACCESO RESTRINGIDO
+                    <br><strong>ESTADO:</strong> ACTIVO - MONITOREO CONTINUO
+                </div>
+                
+                <div class="terminal-text">
+                    > SISTEMA INICIADO...<br>
+                    > VERIFICANDO CREDENCIALES...<br>
+                    > ACCESO CONCEDIDO - BIENVENIDO AL PROYECTO ISOLATES
+                </div>
+            </div>
+        </section>
+
+        <section id="about" class="section">
+            <h2>INFORMACIÓN DEL PROYECTO</h2>
+            <div class="grid">
+                <div class="card">
+                    <h3>NATURALEZA DEL JUEGO</h3>
+                    <p>ISOLATES es una experiencia social inmersiva que combina elementos de supervivencia psicológica con narrativa interactiva. Los participantes se encuentran en entornos de aislamiento controlado donde deben colaborar para descubrir la verdad detrás de su situación.</p>
+                </div>
+                <div class="card">
+                    <h3>MECÁNICAS SOCIALES</h3>
+                    <p>El juego enfatiza la cooperación y comunicación entre jugadores. Las decisiones colectivas afectan el desarrollo de la historia y determinan los posibles finales. La confianza mutua es esencial para la supervivencia.</p>
+                </div>
+                <div class="card">
+                    <h3>IDENTIDAD DEL PROYECTO</h3>
+                    <p>Inspirado en fundaciones de investigación paranormal y espacios liminales, ISOLATES crea una atmósfera única donde la realidad se difumina con lo desconocido. Cada sesión es una nueva oportunidad de explorar los límites de la percepción humana.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="events" class="section">
+            <h2>EVENTOS ACTIVOS</h2>
+            <div class="grid">
+                <div class="card">
+                    <span class="event-status status-active">EVENTO ACTIVO</span>
+                    <h3>EXPERIMENTO ALFA-7</h3>
+                    <p>Prueba de aislamiento sensorial de 72 horas. Los sujetos deben navegar a través de una serie de cámaras interconectadas mientras resuelven enigmas colaborativos. Estado: 12 participantes activos.</p>
+                </div>
+                <div class="card">
+                    <span class="event-status status-pending">PRÓXIMAMENTE</span>
+                    <h3>PROTOCOLO BETA-3</h3>
+                    <p>Simulación de comunicación limitada en entorno hostil. Los equipos tendrán acceso restringido a canales de comunicación y deberán coordinarse para completar objetivos específicos.</p>
+                </div>
+                <div class="card">
+                    <span class="event-status status-classified">CLASIFICADO</span>
+                    <h3>PROYECTO GAMMA-[REDACTED]</h3>
+                    <p>[INFORMACIÓN CLASIFICADA] - Se requiere autorización de Nivel Omega para acceder a los detalles de este evento. Contacte con la administración para más información.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="lore" class="section">
+            <h2>ARCHIVO HISTÓRICO</h2>
+            <div class="grid">
+                <div class="card">
+                    <h3>FUNDACIÓN DEL PROYECTO</h3>
+                    <p>El Proyecto ISOLATES fue establecido tras el descubrimiento de anomalías espaciales en estructuras subterráneas. Las primeras investigaciones revelaron propiedades únicas de estos espacios que afectan la percepción y comportamiento humano.</p>
+                </div>
+                <div class="card">
+                    <h3>DESCUBRIMIENTOS INICIALES</h3>
+                    <p>Los investigadores documentaron efectos de distorsión temporal y espacial en sujetos expuestos a entornos de aislamiento prolongado. Estos hallazgos llevaron al desarrollo de protocolos de investigación más estructurados.</p>
+                </div>
+                <div class="card">
+                    <h3>EVOLUCIÓN ACTUAL</h3>
+                    <p>El proyecto ha evolucionado hacia una plataforma de investigación social, donde voluntarios participan en experimentos controlados que exploran los límites de la cooperación humana bajo condiciones de estrés psicológico.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="reports" class="section">
+            <h2>CENTRO DE REPORTES</h2>
+            <div class="grid">
+                <div class="card">
+                    <h3>REPORTAR ANOMALÍA</h3>
+                    <p>¿Has experimentado comportamientos inusuales, distorsiones perceptuales o eventos inexplicables durante tu participación? Documenta tu experiencia para contribuir a la investigación.</p>
+                    <a href="#" class="btn-report">GENERAR REPORTE</a>
+                </div>
+                <div class="card">
+                    <h3>PROBLEMAS TÉCNICOS</h3>
+                    <p>Reporta fallos del sistema, problemas de conectividad o errores en la plataforma. Tu retroalimentación es crucial para mantener la integridad del proyecto.</p>
+                    <a href="#" class="btn-report">REPORTE TÉCNICO</a>
+                </div>
+                <div class="card">
+                    <h3>CONTACTO DE EMERGENCIA</h3>
+                    <p>Para situaciones que requieren atención inmediata o si experimentas efectos adversos graves, utiliza el canal de comunicación de emergencia.</p>
+                    <a href="#" class="btn-report">EMERGENCIA</a>
+                </div>
+            </div>
+            
+            <div class="terminal-text" style="margin-top: 2rem;">
+                > RECORDATORIO: Todos los reportes son monitoreados y archivados.<br>
+                > La información proporcionada puede ser utilizada para futuros experimentos.<br>
+                > Por favor, mantén la precisión y objetividad en tus reportes.
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p>© 2025 PROYECTO ISOLATES - FUNDACIÓN DE INVESTIGACIÓN EXPERIMENTAL</p>
+        <p>DOCUMENTO CLASIFICADO - NO DISTRIBUIR SIN AUTORIZACIÓN</p>
+    </footer>
+
+    <script>
+        // Smooth scrolling for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Random glitch effect for classification text
+        function addGlitchEffect() {
+            const classificationDiv = document.querySelector('.classification');
+            setInterval(() => {
+                if (Math.random() < 0.1) {
+                    classificationDiv.style.animation = 'glitch 0.3s ease-in-out';
+                    setTimeout(() => {
+                        classificationDiv.style.animation = '';
+                    }, 300);
+                }
+            }, 3000);
+        }
+
+        // Terminal text typing effect
+        function typeWriter(element, text, speed = 100) {
+            let i = 0;
+            element.innerHTML = '';
+            function type() {
+                if (i < text.length) {
+                    element.innerHTML += text.charAt(i);
+                    i++;
+                    setTimeout(type, speed);
+                }
+            }
+            type();
+        }
+
+        // Initialize effects when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            addGlitchEffect();
+            
+            // Add interactive effects to cards
+            document.querySelectorAll('.card').forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-10px) scale(1.02)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+
+            // Report button interactions
+            document.querySelectorAll('.btn-report').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    alert('SISTEMA DE REPORTES ACTIVADO\n\nRedirigiendo a formulario seguro...\n\n[Esta sería la integración con el sistema de reportes real]');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
